@@ -35,7 +35,7 @@
 <div id="budgets-container" class="budget-grid">A carregar os orçamentos do AeroTéc em tempo real...</div>
 
 <script>
-  const apiUrl = 'https://script.google.com/macros/s/AKfycbykgoMDOnJpTRJhD_KHFGplab2Qf8KAPu0GRW_0Z26ecZxu575xP5Gdq_VvO-vjpts-/exec';
+  const apiUrl = 'https://script.google.com/macros/s/AKfycbyDCt9x-x-HI6XHZPC7rTa1eRogEYBNhO7_AdowXSwDcVxxaMfXV9hmjCUGj45VMaY/exec';
 
   fetch(apiUrl)
     .then(response => response.json())
@@ -45,11 +45,15 @@
 
       data.forEach(proj => {
         const inicial = parseFloat(proj.inicial);
+        const patrocinios = parseFloat(proj.patrocinios);
         const gasto = parseFloat(proj.gasto);
+        const saldo = parseFloat(proj.saldo);
+        
+        const orcamentoTotal = inicial + patrocinios;
         let percentagem = 0;
         
-        if (inicial > 0) {
-          percentagem = Math.min((gasto / inicial) * 100, 100).toFixed(1);
+        if (orcamentoTotal > 0) {
+          percentagem = Math.min((gasto / orcamentoTotal) * 100, 100).toFixed(1);
         }
 
         let corBarra = '#4caf50'; // Verde
@@ -59,14 +63,15 @@
         container.innerHTML += `
           <div class="budget-card">
             <h3>${proj.projeto}</h3>
-            <p><strong>Orçamento Inicial:</strong> ${proj.inicial}€</p>
+            <p><strong>Orçamento Inicial:</strong> ${inicial.toFixed(2)}€</p>
+            <p><strong>Patrocínios / Entradas:</strong> ${patrocinios.toFixed(2)}€</p>
             <div class="progress-container">
               <div class="progress-bar" style="width: ${percentagem}%; background-color: ${corBarra};">
                 ${percentagem}%
               </div>
             </div>
-            <p><strong>Despesas:</strong> ${proj.gasto}€</p>
-            <p><strong>Saldo Atual:</strong> ${proj.saldo}€</p>
+            <p><strong>Despesas Processadas:</strong> ${gasto.toFixed(2)}€</p>
+            <p><strong>Saldo Disponível:</strong> ${saldo.toFixed(2)}€</p>
           </div>
         `;
       });
