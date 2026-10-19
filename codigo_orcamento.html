@@ -1,0 +1,78 @@
+<style>
+  .budget-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  .budget-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    background: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+  .budget-card h3 { margin-top: 0; color: #333; }
+  .progress-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    margin: 10px 0;
+    height: 20px;
+  }
+  .progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    line-height: 20px;
+    transition: width 0.4s ease;
+  }
+</style>
+
+<div id="budgets-container" class="budget-grid">A carregar os orçamentos do AeroTéc em tempo real...</div>
+
+<script>
+  const apiUrl = 'COLA_AQUI_O_URL_DA_WEB_APP';
+
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById('budgets-container');
+      container.innerHTML = ''; 
+
+      data.forEach(proj => {
+        const inicial = parseFloat(proj.inicial);
+        const gasto = parseFloat(proj.gasto);
+        let percentagem = 0;
+        
+        if (inicial > 0) {
+          percentagem = Math.min((gasto / inicial) * 100, 100).toFixed(1);
+        }
+
+        let corBarra = '#4caf50'; // Verde
+        if (percentagem > 80) corBarra = '#f44336'; // Vermelho
+        else if (percentagem > 50) corBarra = '#ff9800'; // Laranja
+
+        container.innerHTML += `
+          <div class="budget-card">
+            <h3>${proj.projeto}</h3>
+            <p><strong>Orçamento Inicial:</strong> ${proj.inicial}€</p>
+            <div class="progress-container">
+              <div class="progress-bar" style="width: ${percentagem}%; background-color: ${corBarra};">
+                ${percentagem}%
+              </div>
+            </div>
+            <p><strong>Despesas:</strong> ${proj.gasto}€</p>
+            <p><strong>Saldo Atual:</strong> ${proj.saldo}€</p>
+          </div>
+        `;
+      });
+    })
+    .catch(error => {
+      document.getElementById('budgets-container').innerText = 'Erro ao carregar os dados da tesouraria do AeroTéc.';
+      console.error('Erro:', error);
+    });
+</script>
